@@ -1,0 +1,10 @@
+name: Publish Document
+title:
+username:
+account: rpubs
+server: rpubs.com
+hostUrl: rpubs.com
+appId: https://api.rpubs.com/api/v1/document/587560/cfe183122c284b288d9c3a94ec44466c
+bundleId: https://api.rpubs.com/api/v1/document/587560/cfe183122c284b288d9c3a94ec44466c
+url: http://rpubs.com/alfandash/587560
+when: 1585709785.57457

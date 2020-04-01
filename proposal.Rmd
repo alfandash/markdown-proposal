@@ -19,9 +19,9 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Stress is a feeling of emotional or physical tension. It can come from any event or thought that makes you feel frustrated, angry, or nervous. Stress is your body's reaction to a challenge or demand. In short bursts, stress can be positive, such as when it helps you avoid danger or meet a deadline. But when stress lasts for a long time, it may harm your health.   
 
-From this paper [source][https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5225218/] Stress in some level have crucial association with mood levels, especially stress with high level really contribute to mood swing. This paper focusly in adult age, it mean can happen in productively working ages.   
+From this paper [source](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5225218/) Stress in some level have crucial association with mood levels, especially stress with high level really contribute to mood swing. This paper focusly in adult age, it mean can happen in productively working ages.   
 
-Most of working people life in big city, one of them is Jakarta. Based in this source [link][https://data.tempo.co/read/594/jakarta-kota-dengan-tingkat-stress-ke-enam-dunia] Jakarta is 6th position for highest stress city in the world, we can take look in this chart:
+Most of working people life in big city, one of them is Jakarta. Based in this source [link](https://data.tempo.co/read/594/jakarta-kota-dengan-tingkat-stress-ke-enam-dunia) Jakarta is 6th position for highest stress city in the world, we can take look in this chart:
 
 ```{r fig.align="center", echo=FALSE}
 knitr::include_graphics("./image/Screen Shot 2020-03-21 at 15.29.13.png")
@@ -41,7 +41,7 @@ After we get people expression, next how we help to change their mood? Listening
 
 # Pre processing
 
-We can get audio feature information for each track, and access very easy we can use this [Api link](https://developer.spotify.com/documentation/web-api/reference/tracks/get-audio-features/). In this example i will using spotify dataset from API from this source [kaggle](https://www.kaggle.com/zaheenhamidani/ultimate-spotify-tracks-db).
+We can get audio feature information for each track, and access very easy we can use this [Api link](https://developer.spotify.com/documentation/web-api/reference/tracks/get-audio-features/). In this example i will using spotify data-set from API from this source [kaggle](https://www.kaggle.com/zaheenhamidani/ultimate-spotify-tracks-db).
 
 ```{r message=FALSE}
 library(tidyverse)
@@ -104,10 +104,14 @@ tracks <- tracks  %>%
 
 # Data Exploration
 
-We can say `valence` variable that can help us to predict one track can be more cheerfull (positive) or can be sad (negative). let see the distribution of valance in our dataset.
+We can say `valence` variable that can help us to predict one track can be more cheerful (positive) or can be sad (negative). let see the distribution of valance in our data-set.
 
 ```{r}
-hist(tracks$valence)
+tracks %>% 
+  ggplot(aes(x = valence)) +
+  geom_histogram(binwidth=0.09,color="#e9ecef", fill = "#69b3a2", alpha=0.9, position = "identity") +
+  theme_minimal() +
+  labs(fill="")
 ```
 
 ```{r}
@@ -116,18 +120,20 @@ summary(tracks$valence)
 
 I put summary after the histogram, because we found around 10.000 tracks have valence around 0 value and in summary we can see min of valance is 0.0, it can mean the song is really negative, or spotify platform still have some miss read valance for valance variable.   
 
-From dataset we have, we try to visualize valence grouping with genre. This visualize can help us know, which genre that can give more positive or negative.   
+From data-set we have, we try to visualize valence grouping with genre. This visualize can help us know, which genre that can give more positive or negative.   
 
 ```{r}
 genre_valence <- tracks %>% select(valence, genre) %>% group_by(genre) %>% summarise("average_valence" = mean(valence))
 
-ggplot(data=genre_valence, mapping = aes(x = reorder(genre,average_valence), y = average_valence, fill = genre)) +
-  geom_col() +
+genre_valence %>% 
+ggplot(aes(reorder(genre,average_valence),average_valence)) +
+  geom_col(aes(fill = average_valence)) +
+  scale_fill_gradient(low="lightblue",
+                        high="blue") +
   coord_flip() +
   theme_minimal() +
   theme(
-    legend.position = "none",
-    
+    legend.position = "none"
   ) +
   labs(
     y = "Average valence",
@@ -135,15 +141,18 @@ ggplot(data=genre_valence, mapping = aes(x = reorder(genre,average_valence), y =
   )
 ```
 
-Based on visualize above, we can see Reegae is music genre with highest average valence. It mean genre is the most genre can bring more positiveness and in our case it can help people release their stress.   
+Based on visualize above, we can see Reggae is music genre with highest average valence. It mean genre is the most genre can bring more positiveness and in our case it can help people release their stress.   
 
-From dataset we get, we found we have `genre` whish it we can group our data base on it. We will visualize data, Later it can help us for choose genre is really popular, so if people dont like any genre we suggest we can give them by popularity
+From data-set we get, we found we have `genre` wish it we can group our data base on it. We will visualize data, Later it can help us for choose genre is really popular, so if people don't like any genre we suggest we can give them by popularity
 
 ```{r}
 genre_popularity <- tracks %>% select(popularity, genre) %>% group_by(genre) %>% summarise("average_popularity" = round(mean(popularity)))
 
-ggplot(data=genre_popularity, mapping = aes(x = reorder(genre,average_popularity), y = average_popularity, fill = genre)) +
-  geom_col() +
+genre_popularity %>% 
+ggplot(aes(reorder(genre,average_popularity),average_popularity)) +
+  geom_col(aes(fill = average_popularity)) +
+  scale_fill_gradient(low="orange",
+                        high="red") +
   coord_flip() +
   theme_minimal() +
   theme(
@@ -157,7 +166,7 @@ ggplot(data=genre_popularity, mapping = aes(x = reorder(genre,average_popularity
   
 ```
 
-I will visualize correalation plot that shows correlation for every numerical variable. `Valence` is variable that we will pay attention more than others, because this variable inteprate how music can be cheerful or can be sad. Based on visualize, valence have correlation with most of others variable, onlu speechiness, liveness, and popularity have low correlation.
+I will visualize correlation plot that shows correlation for every numerical variable. `Valence` is variable that we will pay attention more than others, because this variable intepret how music can be cheerful or can be sad. Based on visualize, valence have correlation with most of others variable, only speechiness, liveness, and popularity have low correlation.
 
 ```{r}
 ggcorr(tracks, low = "blue", high = "red")
